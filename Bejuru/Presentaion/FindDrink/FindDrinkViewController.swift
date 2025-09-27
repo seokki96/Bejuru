@@ -6,24 +6,31 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
 class FindDrinkViewController: UIViewController {
+    
+    private lazy var scanStartButton = UIButton().then {
+        $0.setTitle("바코드 스캔", for: .normal)
+        $0.setTitleColor(.black, for: .normal)
+        $0.addTarget(self, action: #selector(scanStartButtonTapped), for: .touchUpInside)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.addSubview(scanStartButton)
         
-        // Do any additional setup after loading the view.
+        scanStartButton.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(10)
+            make.height.equalTo(50)
+            make.center.equalToSuperview()
+        }
     }
-    
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func scanStartButtonTapped() {
+        let barcodeScanVC = BarcodeScanViewController()
+        barcodeScanVC.modalPresentationStyle = .fullScreen
+        navigationController?.present(barcodeScanVC, animated: true)
     }
-    */
-
 }
