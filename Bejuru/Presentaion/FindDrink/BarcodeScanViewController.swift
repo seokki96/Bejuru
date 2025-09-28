@@ -26,11 +26,9 @@ class BarcodeScanViewController: UIViewController, DataScannerViewControllerDele
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegate()
-        setUI()
-        startScan()
     }
         
-    private func setUI() {
+    private func setUI() {        
         view.addSubview(viewController.view)
         
         viewController.view.snp.makeConstraints { make in
@@ -39,12 +37,22 @@ class BarcodeScanViewController: UIViewController, DataScannerViewControllerDele
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setUI()
+        startScan()
+    }
+    
     private func setDelegate() {
         viewController.delegate = self
     }
     
     private func startScan() {
-        try? viewController.startScanning()
+        do {
+            try viewController.startScanning()
+        } catch {
+            print("ERROR: \(error)")
+        }
     }
     
     func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
@@ -57,7 +65,10 @@ class BarcodeScanViewController: UIViewController, DataScannerViewControllerDele
             print("바코드인식: \(barcode.payloadStringValue)")
             dataScanner.stopScanning()
             dataScanner.dismiss(animated: true)
-            dismiss(animated: true)
+            if let barcodeNumber = barcode.payloadStringValue {
+                let scanResultVC = ScanResultViewController(barcodeNumber: barcodeNumber)
+                navigationController?.pushViewController(scanResultVC, animated: true)                
+            }
         default:
             break
         }

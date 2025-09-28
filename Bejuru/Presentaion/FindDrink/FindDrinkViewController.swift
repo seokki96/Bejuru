@@ -30,7 +30,9 @@ class FindDrinkViewController: UIViewController {
 
     @objc func scanStartButtonTapped() {
         let barcodeScanVC = BarcodeScanViewController()
-        barcodeScanVC.modalPresentationStyle = .fullScreen
-        navigationController?.present(barcodeScanVC, animated: true)
+        let navVC = UINavigationController(rootViewController: barcodeScanVC)
+        navVC.modalPresentationStyle = .fullScreen
+        
+        navigationController?.present(navVC, animated: true)
     }
 }
