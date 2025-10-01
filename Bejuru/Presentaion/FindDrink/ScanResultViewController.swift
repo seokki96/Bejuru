@@ -12,7 +12,7 @@ class ScanResultViewController: UIViewController {
     let barcodeNumber: String
 
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()        
     }
     
     init(barcodeNumber: String) {

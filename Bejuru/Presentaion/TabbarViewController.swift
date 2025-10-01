@@ -20,8 +20,11 @@ class TabbarViewController: UITabBarController {
         self.setViewControllers([findDrinkVC, myDrinkVC], animated: false)
         
         guard let items = tabBar.items else { return }
-        items[0].title = "Find Drink"
-        items[1].title = "My Drink"        
+        
+        items[0].title = "주류찾기"
+        items[1].title = "내주류"
+        items[0].image = UIImage(systemName: "wineglass")
+        items[1].image = UIImage(systemName: "person.crop.circle")
     }
 
 }
