@@ -15,9 +15,9 @@ class TabbarViewController: UITabBarController {
     }
     
     func addTabItems() {
-        let findDrinkVC = UINavigationController(rootViewController: FindDrinkViewController())
+        let recommendVC = UINavigationController(rootViewController: LiquorRecommendViewController())
         let myDrinkVC = UINavigationController(rootViewController: MyDrinkViewController())
-        self.setViewControllers([findDrinkVC, myDrinkVC], animated: false)
+        self.setViewControllers([recommendVC, myDrinkVC], animated: false)
         
         guard let items = tabBar.items else { return }
         

@@ -42,6 +42,12 @@ class MyDrinkViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = LiquorTableViewCell(style: .default, reuseIdentifier: LiquorTableViewCell.identifier)
+        cell.selectionStyle = .none
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let liquorDetailVC = LiquorDetailViewController()
+        navigationController?.pushViewController(liquorDetailVC, animated: true)
     }
 }
