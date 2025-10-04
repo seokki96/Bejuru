@@ -7,16 +7,18 @@
 
 import UIKit
 import AVFoundation
+import Vision
 
 class LiquorScanViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     private let captureSession = AVCaptureSession()
     private let previewLayer = PreviewView()
+    private let resultLabel = UILabel()
     
     var isAuthorized: Bool {
         get async {
             let status = AVCaptureDevice.authorizationStatus(for: .video)
-                        
+            
             var isAuthorized = status == .authorized
             
             if status == .notDetermined {
@@ -26,15 +28,29 @@ class LiquorScanViewController: UIViewController, AVCaptureVideoDataOutputSample
             return isAuthorized
         }
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setStyle()
+        setLayout()
         setUpCaptureSession()
     }
     
     private func setStyle() {
         self.view = previewLayer
+        
+        resultLabel.do {
+            $0.backgroundColor = .gray
+        }
+    }
+    
+    private func setLayout() {
+        view.addSubview(resultLabel)
+        
+        resultLabel.snp.makeConstraints { make in
+            make.bottom.equalTo(view.snp.bottomMargin)
+            make.centerX.equalToSuperview()
+        }
     }
     
     private func setUpCaptureSession() {
@@ -63,7 +79,7 @@ class LiquorScanViewController: UIViewController, AVCaptureVideoDataOutputSample
             captureSession.addOutput(videoOutput)
             
             previewLayer.videoPreviewLayer.session = captureSession
-           
+            
             captureSession.commitConfiguration()
             
             Task.detached { [weak self] in
@@ -75,6 +91,29 @@ class LiquorScanViewController: UIViewController, AVCaptureVideoDataOutputSample
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+                
+        guard let model = try? VNCoreMLModel(for: LiquorClassifier().model) else {
+            return
+        }
+        
+        let request = VNCoreMLRequest(model: model) { request, error in
+            guard let result = request.results as? [VNClassificationObservation] else {
+                return
+            }
+            
+            if let topResult = result.first {
+                DispatchQueue.main.async {
+                    self.resultLabel.text = "identifier: \(topResult.identifier) accuracy: \(topResult.confidence * 100)%"
+                }
+            }
+        }
+        
+        let handler = VNImageRequestHandler(ciImage: ciImage)
+        do {
+            try handler.perform([request])
+        } catch {
+            print("ERROR: \(error)")
+        }
     }
 }
 
@@ -82,7 +121,7 @@ class PreviewView: UIView {
     override class var layerClass: AnyClass {
         return AVCaptureVideoPreviewLayer.self
     }
-        
+    
     var videoPreviewLayer: AVCaptureVideoPreviewLayer {
         return layer as! AVCaptureVideoPreviewLayer
     }
